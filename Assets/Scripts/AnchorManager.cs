@@ -43,12 +43,6 @@ public class AnchorManager : MonoBehaviour
     //TODO
     public Vector3 ConvertWorldToLocalPoint(Vector3 point)
     {
-        //Quaternion rotation = Quaternion.FromToRotation(_camera.transform.forward, Vector3.forward);
-        //float distance = Vector3.Distance(_startingWorldPosition, point);
-        //Vector3 rotatedPoint = rotation * point;
-        //Vector3 newLocalPoint = rotatedPoint - _startingWorldPosition;
-        //print(newLocalPoint);
-
         Vector3 localPoint = _camera.transform.InverseTransformPoint(point);
         return localPoint;
     }
@@ -66,8 +60,11 @@ public class AnchorManager : MonoBehaviour
             _anchors.Add(anchor);
 
             anchor.transform.parent = _camera.transform;
-            anchor.transform.localPosition = ConvertWorldToLocalPoint(hit.point);
-            anchor.Position = hit.point;
+            anchor.transform.localPosition = _camera.transform.InverseTransformPoint(hit.point);
+            anchor.GlobalPosition = hit.point;
+            anchor.CameraPosition = transform.position;
+            anchor.CameraRotation = transform.rotation;
+            anchor.LocalPosition = anchor.transform.localPosition;
             anchor.AnchorManager = this;
 
             anchor.name = "Anchor " + _anchors.Count;

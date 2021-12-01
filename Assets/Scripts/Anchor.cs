@@ -5,10 +5,11 @@ public class Anchor : MonoBehaviour
 {
     #region Fields
 
-    /// <summary>
-    /// Spawned position relative to Camera.
-    /// </summary>
-    public Vector3 Position;
+    public Vector3 GlobalPosition;
+    public Vector3 LocalPosition;
+    public Vector3 CameraPosition;
+    public Quaternion CameraRotation;
+    public Quaternion Rotation;
 
     public AnchorManager AnchorManager;
 
@@ -22,10 +23,27 @@ public class Anchor : MonoBehaviour
     /// <returns></returns>
     public async Task UpdateAnchor()
     {
-        transform.localPosition = AnchorManager.ConvertWorldToLocalPoint(Position);
+        //transform.localPosition = AnchorManager.ConvertWorldToLocalPoint(GlobalPosition);
+        CalculateNewLocalPosition();
         transform.rotation = Quaternion.identity;
 
         await Task.Yield();
+    }
+
+    void CalculateNewLocalPosition()
+    {
+        Matrix4x4 matrixExample = Matrix4x4.identity;
+
+        matrixExample.SetTRS(LocalPosition, CameraRotation, Vector3.one);
+
+        Vector3 localSpacePosition = matrixExample.inverse.MultiplyPoint3x4(GlobalPosition);
+        transform.localPosition = localSpacePosition;
+
+        //-----------
+        //Quaternion newRotation = CameraRotation * Quaternion.Inverse(AnchorManager.transform.rotation);
+        //Vector3 rotatedPoint = newRotation * LocalPosition;
+
+        //transform.localPosition = rotatedPoint;
     }
 
     #endregion Methods
