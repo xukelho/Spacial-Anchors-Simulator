@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.RenderPipelines.Unive
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.TextMeshPro", "Unity.TextMeshPro.csproj", "{E42525E6-C825-1AF9-C1A3-14ACD1758889}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Assembly-CSharp", "Assembly-CSharp.csproj", "{A1B2B80F-27DC-0690-5E9F-9E1233CED09E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnchorManagerSimulatorAssembly", "AnchorManagerSimulatorAssembly.csproj", "{72CBB6AD-71F0-114C-2944-F4B0CE2D5D85}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.RenderPipelines.Core.ShaderLibrary", "Unity.RenderPipelines.Core.ShaderLibrary.csproj", "{075FF372-9C98-7B37-76F0-DD2D0DB4CD7A}"
 EndProject
@@ -91,10 +91,10 @@ Global
 		{E42525E6-C825-1AF9-C1A3-14ACD1758889}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E42525E6-C825-1AF9-C1A3-14ACD1758889}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E42525E6-C825-1AF9-C1A3-14ACD1758889}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A1B2B80F-27DC-0690-5E9F-9E1233CED09E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A1B2B80F-27DC-0690-5E9F-9E1233CED09E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A1B2B80F-27DC-0690-5E9F-9E1233CED09E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A1B2B80F-27DC-0690-5E9F-9E1233CED09E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72CBB6AD-71F0-114C-2944-F4B0CE2D5D85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72CBB6AD-71F0-114C-2944-F4B0CE2D5D85}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72CBB6AD-71F0-114C-2944-F4B0CE2D5D85}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72CBB6AD-71F0-114C-2944-F4B0CE2D5D85}.Release|Any CPU.Build.0 = Release|Any CPU
 		{075FF372-9C98-7B37-76F0-DD2D0DB4CD7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{075FF372-9C98-7B37-76F0-DD2D0DB4CD7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{075FF372-9C98-7B37-76F0-DD2D0DB4CD7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
