@@ -10,32 +10,21 @@ namespace AnchorManagerSimulator
         /// <summary>
         /// Global position of the object when was first instantiated. To be removed. Avoid usage.
         /// </summary>
+        [HideInInspector]
         public Vector3 GlobalPosition;
 
         /// <summary>
-        /// Local position of the object when was first instantiated.
+        /// Global rotation of the object when was first instantiated.
         /// </summary>
-        public Vector3 LocalPosition;
-
-        /// <summary>
-        /// Local rotation of the object when was first instantiated.
-        /// </summary>
-        public Quaternion LocalRotation;
-
-        /// <summary>
-        /// Global position of the camera when the object was first instantiated.
-        /// </summary>
-        public Vector3 CameraGlobalPosition;
-
-        /// <summary>
-        /// Global rotation of the camera when the object was first instantiated.
-        /// </summary>
-        public Quaternion CameraGlobalRotation;
+        [HideInInspector]
+        public Quaternion GlobalRotation;
 
         /// <summary>
         /// Anchor Manager / Main Camera reference
         /// </summary>
         public AnchorManager AnchorManager;
+
+        int _frameIgnoreCounter = 0;
 
         #endregion Fields
 
@@ -47,19 +36,48 @@ namespace AnchorManagerSimulator
         /// <returns></returns>
         public async Task UpdateAnchor()
         {
-            //transform.localPosition = AnchorManager.ConvertWorldToLocalPoint(GlobalPosition);
-            //transform.rotation = Quaternion.identity;
+            if (!CanCalculateReposition())
+                return;
 
-            CalculateNewLocalPosition();
+            transform.position = GlobalPosition;
+            transform.rotation = GlobalRotation;
 
             await Task.Yield();
         }
 
-        void CalculateNewLocalPosition()
+        /// <summary>
+        /// Returns if the object is within the immediate recalculation range.
+        /// </summary>
+        /// <returns> Yes/No. </returns>
+        bool IsWithinImmediateCalculationDistance()
         {
-            Vector3 cameraMovedOffset = AnchorManager.transform.position - CameraGlobalPosition;
-            Vector3 newLocalPosition = cameraMovedOffset + LocalPosition;
-            transform.localPosition = newLocalPosition;
+            Vector3 offset = AnchorManager.Camera.transform.position - transform.position;
+            float sqrLen = offset.sqrMagnitude;
+            
+            // square the distance we compare with
+            bool isWithinMargin = (sqrLen < AnchorManager.DistanceToCalculateRepositionOfAnchorsImmediatly * AnchorManager.DistanceToCalculateRepositionOfAnchorsImmediatly);
+
+            return isWithinMargin;
+        }
+
+        /// <summary>
+        /// Calculates if the object can recalculate its position.
+        /// </summary>
+        /// <returns> Yes/No. </returns>
+        bool CanCalculateReposition()
+        {
+            if (!IsWithinImmediateCalculationDistance())
+            {
+                if (_frameIgnoreCounter != AnchorManager.FrameIgnoreValue)
+                {
+                    _frameIgnoreCounter++;
+                    return false;
+                }
+                else
+                    _frameIgnoreCounter = 0;
+            }
+
+            return true;
         }
 
         #endregion Methods

@@ -8,15 +8,19 @@ namespace AnchorManagerSimulator
     {
         #region Fields
 
-        [Tooltip("How often, in seconds, to recalculate all anchors positions.")]
-        public float AnchorUpdateInterval = .1f;
+        [Tooltip("Set the distance to when an anchor position is calculated immediatly, or after a set interval.")]
+        public float DistanceToCalculateRepositionOfAnchorsImmediatly = 3;
+
+        [Tooltip("Set the number of frames that will be skipped until the anchors that are far away can be calculated again.")]
+        public int FrameIgnoreValue = 10;
+
+        [Header("Scene References")]
+        [Space(20)]
+        public Camera Camera;
 
         [Header("Prefab References")]
+        [Space(20)]
         public Anchor PrefabAnchor;
-
-        public Vector3 StartingWorldPosition { get; private set; }
-
-        Camera _camera;
 
         List<Anchor> _anchors = new List<Anchor>();
 
@@ -27,24 +31,10 @@ namespace AnchorManagerSimulator
 
         #region Unity
 
-        void Awake()
-        {
-            _camera = GetComponent<Camera>();
-            StartingWorldPosition = transform.position;
-        }
-
         void Update()
         {
-            if (Input.GetMouseButtonDown(0))
-                SpawnAnchor();
-
-            if (_lastFrameCameraPosition == transform.position && _lastFrameCameraRotation == transform.rotation)
-                return;
-
-            UpdateAnchors();
-
-            _lastFrameCameraPosition = transform.position;
-            _lastFrameCameraRotation = transform.rotation;
+            HandleSpawnOfAnchors();
+            HandleUpdateOfAnchors();
         }
 
         #endregion Unity
@@ -52,26 +42,53 @@ namespace AnchorManagerSimulator
         #region Methods
 
         /// <summary>
+        /// Manages when an anchor can be spawned.
+        /// </summary>
+        void HandleSpawnOfAnchors()
+        {
+            if (Input.GetMouseButtonDown(0))
+                SpawnAnchor();
+        }
+
+        /// <summary>
+        /// Manages when anchors can be updated.
+        /// </summary>
+        void HandleUpdateOfAnchors()
+        {
+            var lastFrameCameraPosition = _lastFrameCameraPosition;
+            var lastFrameCameraRotation = _lastFrameCameraRotation;
+
+            _lastFrameCameraPosition = Camera.transform.position;
+            _lastFrameCameraRotation = Camera.transform.rotation;
+
+            if (lastFrameCameraPosition == Camera.transform.position &&
+                lastFrameCameraRotation.x == Camera.transform.rotation.x && //Comparing lastFrameCameraRotation == Camera.transform.rotation
+                lastFrameCameraRotation.y == Camera.transform.rotation.y && //isn't providing the correct results so each value must be 
+                lastFrameCameraRotation.z == Camera.transform.rotation.z && //compared separatly
+                lastFrameCameraRotation.w == Camera.transform.rotation.w)
+                return;
+
+            UpdateAnchors();
+        }
+
+        /// <summary>
         /// Spawns an Anchor in the intersection of a ray from the center of the screen, to the first collider hit.
         /// </summary>
         void SpawnAnchor()
         {
-            Ray ray = _camera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2));
+            Ray ray = Camera.ScreenPointToRay(new Vector3(Screen.width / 2, Screen.height / 2));
 
             if (Physics.Raycast(ray, out RaycastHit hit))
             {
                 Anchor anchor = Instantiate(PrefabAnchor);
                 _anchors.Add(anchor);
 
-                anchor.transform.parent = _camera.transform;
+                anchor.transform.parent = Camera.transform;
                 anchor.transform.position = hit.point;
                 anchor.transform.LookAt(new Vector3(transform.position.x, anchor.transform.position.y, transform.position.z));
 
                 anchor.GlobalPosition = hit.point;
-                anchor.CameraGlobalPosition = transform.position;
-                anchor.CameraGlobalRotation = transform.rotation;
-                anchor.LocalPosition = anchor.transform.localPosition;
-                anchor.LocalRotation = anchor.transform.localRotation;
+                anchor.GlobalRotation = anchor.transform.rotation;
                 anchor.AnchorManager = this;
 
                 anchor.name = "Anchor " + _anchors.Count;
