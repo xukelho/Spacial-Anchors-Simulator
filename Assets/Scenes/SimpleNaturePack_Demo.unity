@@ -4613,7 +4613,7 @@ MonoBehaviour:
   Camera: {fileID: 1136385242}
   MaterialAnchorDefault: {fileID: 2100000, guid: 2401b4cff9dba3547a219482c6bd9c45, type: 2}
   MaterialAnchorClosest: {fileID: 2100000, guid: b23f7256ea3914646baaef48e7e2204e, type: 2}
-  PrefabAnchor: {fileID: 501938611114817719, guid: b121a2c8dad5dbb499cdf03cab017235, type: 3}
+  PrefabAnchor: {fileID: 501938611114817719, guid: 9148fd9e9b88d8b498cb488ec0e2714a, type: 3}
 --- !u!4 &1566987096
 Transform:
   m_ObjectHideFlags: 0
