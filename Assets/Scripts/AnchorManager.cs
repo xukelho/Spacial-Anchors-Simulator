@@ -110,6 +110,8 @@ namespace AnchorManagerSimulator
                     ClosestAnchor = anchor;
                     ClosestAnchor.ChangeMaterial(MaterialAnchorClosest);
                 }
+
+                UpdateAnchors();
             }
         }
 
