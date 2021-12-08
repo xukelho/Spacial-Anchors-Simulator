@@ -7,6 +7,8 @@ namespace AnchorManagerSimulator
     {
         #region Fields
 
+        public float DistanceToCamera = Mathf.Infinity;
+
         /// <summary>
         /// Global position of the object when was first instantiated. To be removed. Avoid usage.
         /// </summary>
@@ -19,6 +21,9 @@ namespace AnchorManagerSimulator
         [HideInInspector]
         public Quaternion GlobalRotation;
 
+        [HideInInspector]
+        public Collider Collider;
+
         /// <summary>
         /// Anchor Manager / Main Camera reference
         /// </summary>
@@ -26,7 +31,24 @@ namespace AnchorManagerSimulator
 
         int _frameIgnoreCounter = 0;
 
+        MeshRenderer _meshRenderer;
+
         #endregion Fields
+
+        #region Unity
+
+        void Awake()
+        {
+            _meshRenderer = GetComponent<MeshRenderer>();
+            Collider = GetComponent<Collider>();
+        }
+
+        void Start()
+        {
+            UpdateDistanceToCamera();
+        }
+
+        #endregion Unity
 
         #region Methods
 
@@ -45,17 +67,26 @@ namespace AnchorManagerSimulator
             await Task.Yield();
         }
 
+        public void ChangeMaterial(Material mat)
+        {
+            _meshRenderer.material = mat;
+        }
+
+        public void UpdateDistanceToCamera()
+        {
+            //Usually, the square product is more effient to find the closest distance
+            //but in this case, since the distance is needed to be stored to be accessed later
+            //Vector3.Distance is the only choice
+            DistanceToCamera = Vector3.Distance(AnchorManager.Camera.transform.position, transform.position);
+        }
+
         /// <summary>
         /// Returns if the object is within the immediate recalculation range.
         /// </summary>
         /// <returns> Yes/No. </returns>
         bool IsWithinImmediateCalculationDistance()
         {
-            Vector3 offset = AnchorManager.Camera.transform.position - transform.position;
-            float sqrLen = offset.sqrMagnitude;
-            
-            // square the distance we compare with
-            bool isWithinMargin = (sqrLen < AnchorManager.DistanceToCalculateRepositionOfAnchorsImmediatly * AnchorManager.DistanceToCalculateRepositionOfAnchorsImmediatly);
+            bool isWithinMargin = (DistanceToCamera <= AnchorManager.DistanceToCalculateRepositionOfAnchorsImmediatly);
 
             return isWithinMargin;
         }

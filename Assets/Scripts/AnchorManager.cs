@@ -8,6 +8,10 @@ namespace AnchorManagerSimulator
     {
         #region Fields
 
+        [Space(20)]
+        public Anchor ClosestAnchor;
+
+        [Space(20)]
         [Tooltip("Set the distance to when an anchor position is calculated immediatly, or after a set interval.")]
         public float DistanceToCalculateRepositionOfAnchorsImmediatly = 3;
 
@@ -17,6 +21,12 @@ namespace AnchorManagerSimulator
         [Header("Scene References")]
         [Space(20)]
         public Camera Camera;
+
+        [Header("Material References")]
+        [Space(20)]
+        public Material MaterialAnchorDefault;
+
+        public Material MaterialAnchorClosest;
 
         [Header("Prefab References")]
         [Space(20)]
@@ -61,14 +71,16 @@ namespace AnchorManagerSimulator
             _lastFrameCameraPosition = Camera.transform.position;
             _lastFrameCameraRotation = Camera.transform.rotation;
 
+            //Verify if the camera has moved/rotated
             if (lastFrameCameraPosition == Camera.transform.position &&
                 lastFrameCameraRotation.x == Camera.transform.rotation.x && //Comparing lastFrameCameraRotation == Camera.transform.rotation
-                lastFrameCameraRotation.y == Camera.transform.rotation.y && //isn't providing the correct results so each value must be 
+                lastFrameCameraRotation.y == Camera.transform.rotation.y && //isn't providing the correct results so each value must be
                 lastFrameCameraRotation.z == Camera.transform.rotation.z && //compared separatly
                 lastFrameCameraRotation.w == Camera.transform.rotation.w)
                 return;
 
-            UpdateAnchors();
+            if (_anchors.Count != 0)
+                UpdateAnchors();
         }
 
         /// <summary>
@@ -92,6 +104,12 @@ namespace AnchorManagerSimulator
                 anchor.AnchorManager = this;
 
                 anchor.name = "Anchor " + _anchors.Count;
+
+                if (ClosestAnchor == null)
+                {
+                    ClosestAnchor = anchor;
+                    ClosestAnchor.ChangeMaterial(MaterialAnchorClosest);
+                }
             }
         }
 
@@ -104,8 +122,23 @@ namespace AnchorManagerSimulator
 
             var tasks = new List<Task>();
 
+            ClosestAnchor.UpdateDistanceToCamera();
+            tasks.Add(ClosestAnchor.UpdateAnchor());
+
             for (int i = 0; i < _anchors.Count; i++)
-                tasks.Add(_anchors[i].UpdateAnchor());
+                if (_anchors[i] != ClosestAnchor)
+                {
+                    Anchor anchor = _anchors[i];
+                    anchor.UpdateDistanceToCamera();
+                    tasks.Add(anchor.UpdateAnchor());
+
+                    if (anchor.DistanceToCamera < ClosestAnchor.DistanceToCamera)
+                    {
+                        anchor.ChangeMaterial(MaterialAnchorClosest);
+                        ClosestAnchor.ChangeMaterial(MaterialAnchorDefault);
+                        ClosestAnchor = anchor;
+                    }
+                }
 
             await Task.WhenAll(tasks);
         }
